@@ -1,0 +1,73 @@
+<div class="file-upload-container">
+  <h2>File Upload</h2>
+
+  <!-- File input -->
+  <input type="file" (change)="onFileSelect($event)" multiple accept="image/*,application/pdf" />
+
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+  <div *ngIf="files.length > 0" class="file-preview-container">
+    <div *ngFor="let file of files; let i = index" class="file-preview">
+      <div class="preview">
+        <!-- Image preview for images -->
+        <div *ngIf="file.file.type.startsWith('image')" class="image-preview">
+          <img [src]="file.previewUrl" alt="File preview" class="file-thumbnail" />
+        </div>
+        <!-- PDF preview (show a simple icon for now) -->
+        <div *ngIf="file.file.type === 'application/pdf'" class="pdf-preview">
+          <img src="assets/pdf-icon.png" alt="PDF Preview" class="file-thumbnail" />
+        </div>
+
+        <div class="file-details">
+          <p class="file-name">{{ file.name }}</p>
+          <div class="progress-bar">
+            <div class="progress-bar-fill" [style.width]="file.progress + '%'"></div>
+            <span class="progress-percent">{{ file.progress }}%</span>
+          </div>
+          <small *ngIf="file.error" class="error">{{ file.error }}</small>
+        </div>
+      </div>
+      <button (click)="cancelUpload(file)" [disabled]="uploading">Cancel</button>
+    </div>
+  </div>
+
+  <button (click)="uploadFiles()" [disabled]="isUploadDisabled()">Upload Files</button>
+  
+  <!-- Show the 'Final Upload' button after all files are uploaded temporarily -->
+  <button *ngIf="canFinalize" (click)="finalUpload()" [disabled]="uploading">Final Upload</button>
+
+  <!-- Show Global Progress Bar for Final Upload -->
+  <div *ngIf="finalUploadInProgress" class="global-progress-bar">
+    <div class="progress-bar-fill" [style.width]="globalProgress + '%'"></div>
+    <span class="progress-percent">{{ globalProgress }}%</span>
+  </div>
+
+  <!-- Open Camera Button -->
+  <button (click)="openCamera()">Open Camera</button>
+
+  <!-- Webcam Video Stream -->
+  <video *ngIf="isCameraOpen" #videoElement width="320" height="240" autoplay></video>
+
+  <!-- Capture Image Button -->
+  <button *ngIf="isCameraOpen" (click)="captureImage()">Capture Image</button>
+
+  <!-- Display captured image -->
+  <!-- <div *ngIf="capturedImage">
+    <img [src]="capturedImage" alt="Captured Image" class="captured-thumbnail" />
+  </div> -->
+
+  <!-- Preview Section for Captured Images -->
+<div *ngIf="capturedImages.length > 0" class="captured-preview-container">
+  <h3>Captured Images</h3>
+  <div *ngFor="let capturedImage of capturedImages; let i = index" class="file-preview">
+    <div class="preview">
+      <img [src]="capturedImage.previewUrl" alt="Captured Image" class="file-thumbnail" />
+      <button class="cancel" (click)="cancelCapturedImage(i)">Cancel</button>
+    </div>
+  </div>
+  <button (click)="addCapturedImagesToUpload()" [disabled]="capturedImages.length === 0">
+    Add to Upload Files
+  </button>
+</div>
+
+</div>
